@@ -1,0 +1,17 @@
+[Unit]
+Description=Stretch Reminder Service
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/stretch-reminder
+Restart=on-failure
+RestartSec=10
+# Remove the User=%u line - it's not needed for user services
+Environment="DISPLAY=:0"
+Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%U/bus"
+Environment="XDG_RUNTIME_DIR=/run/user/%U"
+
+[Install]
+WantedBy=graphical-session.target
