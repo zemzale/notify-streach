@@ -12,11 +12,14 @@ void signalHandler(int signal) {
   std::cout << "Shutting down stretch reminder..." << std::endl;
 }
 
-bool sendNotification(const std::string &title, const std::string &message) {
+constexpr char TITLE[] = "Time to stretch!";
+constexpr char MESSAGE[] = "Take a short break and stretch your body.";
+constexpr char ICON[] = "appointment-soon";
+constexpr char APP_NAME[] = "StretchReminder";
+
+bool sendNotification() {
   NotifyNotification *notification =
-      notify_notification_new(title.c_str(), message.c_str(),
-                              "appointment-soon" // Calendar icon
-      );
+      notify_notification_new(TITLE, MESSAGE, ICON);
 
   // Set notification properties
   notify_notification_set_timeout(notification, 10000); // 10 seconds
@@ -42,17 +45,18 @@ int main() {
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
-  std::cout << "Stretch reminder started. Press Ctrl+C to exit." << std::endl;
-
   // Main loop
   while (running) {
     // Send notification
-    sendNotification("Time to Stretch!",
-                     "Take a short break and stretch your body.");
+    sendNotification();
 
-    // Wait for 30 minutes (1800 seconds)
-    for (int i = 0; i < 1800 && running; ++i) {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+    // Calculate next reminder time (30 minutes from now)
+    auto next_reminder = std::chrono::steady_clock::now() + 
+                       std::chrono::minutes(30);
+    
+    // Sleep until next reminder or until interrupted
+    while (running && std::chrono::steady_clock::now() < next_reminder) {
+      std::this_thread::sleep_for(std::chrono::seconds(5));
     }
   }
 
