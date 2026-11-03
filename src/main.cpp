@@ -23,7 +23,7 @@ bool sendNotification() {
 
   // Set notification properties
   notify_notification_set_timeout(notification, 10000); // 10 seconds
-  notify_notification_set_urgency(notification, NOTIFY_URGENCY_NORMAL);
+  notify_notification_set_urgency(notification, NOTIFY_URGENCY_CRITICAL);
 
   // Show notification
   bool success = notify_notification_show(notification, nullptr);
@@ -51,9 +51,9 @@ int main() {
     sendNotification();
 
     // Calculate next reminder time (30 minutes from now)
-    auto next_reminder = std::chrono::steady_clock::now() + 
-                       std::chrono::minutes(30);
-    
+    auto next_reminder =
+        std::chrono::steady_clock::now() + std::chrono::minutes(30);
+
     // Sleep until next reminder or until interrupted
     while (running && std::chrono::steady_clock::now() < next_reminder) {
       std::this_thread::sleep_for(std::chrono::seconds(5));
